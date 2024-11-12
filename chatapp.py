@@ -25,7 +25,9 @@ def get_pdf_text(pdf_docs):
 
 
 def get_text_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=50000, chunk_overlap=1000)
+    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=50000, chunk_overlap=1000)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+
     chunks = text_splitter.split_text(text)
     return chunks
 
@@ -59,7 +61,8 @@ def get_conversational_chain():
 def user_input(user_question):
     embeddings = GoogleGenerativeAIEmbeddings(model = "models/embedding-001")
     
-    new_db = FAISS.load_local("faiss_index", embeddings)
+    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
@@ -71,6 +74,7 @@ def user_input(user_question):
 
     print(response)
     st.write("Reply: ", response["output_text"])
+    
 
 
 
@@ -111,6 +115,15 @@ def main():
         """,
         unsafe_allow_html=True
     )
+    st.markdown(
+    """
+    <div style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #0E1117; padding: 15px; text-align: center;">
+        © <a href="https://github.com/myekini/Multi-PDFs_ChatApp_AI-Agent.git" target="_blank">Muhammad Yekini</a> | Made with ❤️
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
 if __name__ == "__main__":
     main()
